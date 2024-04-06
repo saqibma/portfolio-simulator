@@ -8,7 +8,7 @@ def asset_with_non_zero_prices():
     asset.children = [
         Asset("AAPL", 10, price=150.0),
         Asset("MSFT", 20, price=100.0),
-        Asset("NVDA", 15, price=200.0)
+        Asset("NVDA", 15, price=200.0),
     ]
     return asset
 
@@ -19,7 +19,7 @@ def asset_with_zero_prices():
     asset.children = [
         Asset("FORD", 10, price=0.0),
         Asset("TSLA", 20, price=0.0),
-        Asset("BMW", 15, price=0.0)
+        Asset("BMW", 15, price=0.0),
     ]
     return asset
 
@@ -48,10 +48,10 @@ def test_calculate_portfolio(asset_with_non_zero_prices):
 
 def test_repr(asset_with_non_zero_prices):
     assert (
-            repr(asset_with_non_zero_prices)
-            == "Asset(name='TECH', no_of_shares=100, price=0.0, children=["
-               "Asset(name='AAPL', no_of_shares=10, price=150.0, children=[]), "
-               "Asset(name='MSFT', no_of_shares=20, price=100.0, children=[]), "
-               "Asset(name='NVDA', no_of_shares=15, price=200.0, children=[])"
-               "])"
+        repr(asset_with_non_zero_prices)
+        == "Asset(name='TECH', no_of_shares=100, price=0.0, children=["
+        "Asset(name='AAPL', no_of_shares=10, price=150.0, children=[]), "
+        "Asset(name='MSFT', no_of_shares=20, price=100.0, children=[]), "
+        "Asset(name='NVDA', no_of_shares=15, price=200.0, children=[])"
+        "])"
     )

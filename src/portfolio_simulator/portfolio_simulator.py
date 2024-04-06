@@ -1,14 +1,30 @@
 import csv
 import os
+from typing import List, Optional
 
 from asset import Asset
 
 
+def stream_csv_in_chunks(filename: str, chunk_size: int = 10):
+    with open(filename, "r") as file:
+        reader = csv.reader(file)
+        # Skip header if present
+        next(reader, None)
+        chunk = []
+        for row in reader:
+            chunk.append(row)
+            if len(chunk) >= chunk_size:
+                yield chunk
+                chunk = []
+        if chunk:  # Yield any remaining records
+            yield chunk
+
+
 class PortfolioSimulator:
     def __init__(self):
-        self.portfolios = []
+        self.portfolios: List[Asset] = []
 
-    def load_portfolios(self, portfolio_file):
+    def load_portfolios(self, portfolio_file: str) -> None:
         with open(portfolio_file, "r") as file:
             reader = csv.reader(file)
             current_portfolio = None
@@ -32,32 +48,18 @@ class PortfolioSimulator:
                     current_portfolio = Asset(row[0])
                     self.portfolios.append(current_portfolio)
 
-    def traverse_portfolios(self, assets=None):
+    def traverse_portfolios(self, assets: Optional[List[Asset]] = None) -> None:
         if assets is None:
             assets = self.portfolios
         for asset in assets:
             print(asset)
             self.traverse_portfolios(asset.children)
 
-    def stream_csv_in_chunks(self, filename, chunk_size=10):
-        with open(filename, "r") as file:
-            reader = csv.reader(file)
-            # Skip header if present
-            next(reader, None)
-            chunk = []
-            for row in reader:
-                chunk.append(row)
-                if len(chunk) >= chunk_size:
-                    yield chunk
-                    chunk = []
-            if chunk:  # Yield any remaining records
-                yield chunk
-
-    def calculate_portfolio_prices(self, prices_file, output_file):
+    def calculate_portfolio_prices(self, prices_file: str, output_file: str) -> None:
         with open(output_file, "w", newline="") as outfile:
             writer = csv.writer(outfile)
             writer.writerow(["NAME", "PRICE"])
-            for chunk in self.stream_csv_in_chunks(prices_file, chunk_size=1):
+            for chunk in stream_csv_in_chunks(prices_file, chunk_size=1):
                 calculated_prices = []
                 for row in chunk:
                     stock_name, stock_price = row[0], float(row[1])
@@ -65,13 +67,15 @@ class PortfolioSimulator:
                     self.update_asset_price(
                         self.portfolios, stock_name, stock_price, calculated_prices
                     )
-                writer.writerows(
-                    map(
-                        lambda asset_price: asset_price, calculated_prices
-                    )
-                )
+                writer.writerows(calculated_prices)
 
-    def update_asset_price(self, assets, stock_name, stock_price, calculated_prices):
+    def update_asset_price(
+        self,
+        assets: List[Asset],
+        stock_name: str,
+        stock_price: float,
+        calculated_prices: List[List],
+    ) -> None:
         for asset in assets:
             if asset.name == stock_name:
                 asset.price = stock_price
@@ -81,7 +85,10 @@ class PortfolioSimulator:
                         asset.price = asset.calculate_portfolio_value()
                         calculated_prices.append([asset.name, asset.price])
                 return
-            self.update_asset_price(asset.children, stock_name, stock_price, calculated_prices)
+            self.update_asset_price(
+                asset.children, stock_name, stock_price, calculated_prices
+            )
+
 
 def main():
     portfolios_csv_path = os.path.join("..", "..", "data", "input", "portfolios.csv")
@@ -92,9 +99,7 @@ def main():
     simulator = PortfolioSimulator()
     simulator.load_portfolios(portfolios_csv_path)
     simulator.traverse_portfolios()
-    simulator.calculate_portfolio_prices(
-        prices_csv_path, portfolio_prices_csv_path
-    )
+    simulator.calculate_portfolio_prices(prices_csv_path, portfolio_prices_csv_path)
     print("********************************")
     simulator.traverse_portfolios()
 
