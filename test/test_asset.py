@@ -33,20 +33,20 @@ def asset_with_no_children():
     return asset
 
 
-def test_should_calculate_portfolio_all_assets_non_zero(asset_with_non_zero_prices):
-    assert asset_with_non_zero_prices.should_calculate_portfolio()
+def test_has_valid_prices_all_assets_non_zero(asset_with_non_zero_prices):
+    assert asset_with_non_zero_prices.has_valid_prices()
 
 
-def test_should_calculate_portfolio_some_assets_zero(asset_with_zero_prices):
-    assert not asset_with_zero_prices.should_calculate_portfolio()
+def test_has_valid_prices_some_assets_zero(asset_with_zero_prices):
+    assert not asset_with_zero_prices.has_valid_prices()
 
 
-def test_should_calculate_portfolio_no_children(asset_with_no_children):
-    assert not asset_with_no_children.should_calculate_portfolio()
+def test_has_valid_prices_no_children(asset_with_no_children):
+    assert not asset_with_no_children.has_valid_prices()
 
 
 def test_calculate_portfolio(asset_with_non_zero_prices):
-    assert asset_with_non_zero_prices.calculate_portfolio() == 6500
+    assert asset_with_non_zero_prices.calculate_portfolio_value() == 6500
 
 
 def test_repr(asset_with_non_zero_prices):

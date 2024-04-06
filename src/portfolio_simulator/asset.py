@@ -7,7 +7,7 @@ class Asset:
         self.process = False
         self.parent = None
 
-    def should_calculate_portfolio(self):
+    def has_valid_prices(self):
         """
         Check if all asset prices are non-zero
         """
@@ -17,7 +17,7 @@ class Asset:
             and all(asset.price != 0.0 for asset in self.children)
         )
 
-    def calculate_portfolio(self):
+    def calculate_portfolio_value(self):
         """
         Calculate the total value of the portfolio by summing
         the product of price and number of shares for each asset
