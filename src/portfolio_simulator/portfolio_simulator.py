@@ -58,44 +58,30 @@ class PortfolioSimulator:
             writer = csv.writer(outfile)
             writer.writerow(["NAME", "PRICE"])
             for chunk in self.stream_csv_in_chunks(prices_file, chunk_size=1):
+                calculated_prices = []
                 for row in chunk:
                     stock_name, stock_price = row[0], float(row[1])
                     writer.writerow([stock_name, stock_price])
                     self.update_asset_price(
-                        self.portfolios, stock_name, stock_price
+                        self.portfolios, stock_name, stock_price, calculated_prices
                     )
-                calculated_prices = []
-                self.calculate_assets_portfolio_price(
-                    self.portfolios, calculated_prices
-                )
                 writer.writerows(
                     map(
-                        lambda asset_price: asset_price,
-                        reversed(calculated_prices)
+                        lambda asset_price: asset_price, calculated_prices
                     )
                 )
 
-    def update_asset_price(self, assets, stock_name, stock_price):
+    def update_asset_price(self, assets, stock_name, stock_price, calculated_prices):
         for asset in assets:
             if asset.name == stock_name:
                 asset.price = stock_price
                 while asset.parent:
-                    asset.parent.process = True
                     asset = asset.parent
+                    if asset.has_valid_prices():
+                        asset.price = asset.calculate_portfolio_value()
+                        calculated_prices.append([asset.name, asset.price])
                 return
-            self.update_asset_price(asset.children, stock_name, stock_price)
-
-    def calculate_assets_portfolio_price(self, assets, calculated_prices):
-        for asset in assets:
-            if asset.has_valid_prices():
-                total_price = asset.calculate_portfolio_value()
-                asset.price = total_price
-                asset.process = False
-                calculated_prices.append([asset.name, total_price])
-            self.calculate_assets_portfolio_price(
-                asset.children, calculated_prices
-            )
-
+            self.update_asset_price(asset.children, stock_name, stock_price, calculated_prices)
 
 def main():
     portfolios_csv_path = os.path.join("..", "..", "data", "input", "portfolios.csv")

@@ -4,7 +4,6 @@ class Asset:
         self.no_of_shares = no_of_shares
         self.children = []
         self.price = price
-        self.process = False
         self.parent = None
 
     def has_valid_prices(self):
@@ -12,8 +11,7 @@ class Asset:
         Check if all asset prices are non-zero
         """
         return (
-            self.process
-            and len(self.children) > 0
+            len(self.children) > 0
             and all(asset.price != 0.0 for asset in self.children)
         )
 
@@ -31,6 +29,5 @@ class Asset:
             f"Asset(name='{self.name}', "
             f"no_of_shares={self.no_of_shares}, "
             f"price={self.price}, "
-            f"process={self.process}, "
             f"children={self.children})"
         )
