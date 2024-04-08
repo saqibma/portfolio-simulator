@@ -55,11 +55,11 @@ class PortfolioSimulator:
                 writer.writerows(calculated_prices)
 
     def update_asset_price(
-            self,
-            assets: List[Asset],
-            stock_name: str,
-            stock_price: float,
-            calculated_prices: List[List],
+        self,
+        assets: List[Asset],
+        stock_name: str,
+        stock_price: float,
+        calculated_prices: List[List],
     ) -> None:
         for asset in assets:
             if asset.name == stock_name:

@@ -56,5 +56,6 @@ def test_repr(asset_with_non_zero_prices):
         "])"
     )
 
+
 if __name__ == "__main__":
     pytest.main([__file__])
