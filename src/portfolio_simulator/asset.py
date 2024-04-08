@@ -4,7 +4,7 @@ from typing import List, Optional
 class Asset:
     def __init__(self, name: str, no_of_shares: int = 1, price: float = 0.0):
         self.name = name
-        self.no_of_shares = no_of_shares
+        self.no_of_shares = no_of_shares # no_of_assets
         self.children: List[Asset] = []
         self.price = price
         self.parent: Optional[Asset] = None

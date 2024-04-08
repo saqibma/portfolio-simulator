@@ -55,3 +55,6 @@ def test_repr(asset_with_non_zero_prices):
         "Asset(name='NVDA', no_of_shares=15, price=200.0, children=[])"
         "])"
     )
+
+if __name__ == "__main__":
+    pytest.main([__file__])

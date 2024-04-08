@@ -2,22 +2,7 @@ import csv
 import os
 from typing import List, Optional
 
-from asset import Asset
-
-
-def stream_csv_in_chunks(filename: str, chunk_size: int = 10):
-    with open(filename, "r") as file:
-        reader = csv.reader(file)
-        # Skip header if present
-        next(reader, None)
-        chunk = []
-        for row in reader:
-            chunk.append(row)
-            if len(chunk) >= chunk_size:
-                yield chunk
-                chunk = []
-        if chunk:  # Yield any remaining records
-            yield chunk
+from src.portfolio_simulator.asset import Asset
 
 
 class PortfolioSimulator:
@@ -59,7 +44,7 @@ class PortfolioSimulator:
         with open(output_file, "w", newline="") as outfile:
             writer = csv.writer(outfile)
             writer.writerow(["NAME", "PRICE"])
-            for chunk in stream_csv_in_chunks(prices_file, chunk_size=1):
+            for chunk in self.stream_csv_in_chunks(prices_file, chunk_size=1):
                 calculated_prices = []
                 for row in chunk:
                     stock_name, stock_price = row[0], float(row[1])
@@ -70,11 +55,11 @@ class PortfolioSimulator:
                 writer.writerows(calculated_prices)
 
     def update_asset_price(
-        self,
-        assets: List[Asset],
-        stock_name: str,
-        stock_price: float,
-        calculated_prices: List[List],
+            self,
+            assets: List[Asset],
+            stock_name: str,
+            stock_price: float,
+            calculated_prices: List[List],
     ) -> None:
         for asset in assets:
             if asset.name == stock_name:
@@ -88,6 +73,21 @@ class PortfolioSimulator:
             self.update_asset_price(
                 asset.children, stock_name, stock_price, calculated_prices
             )
+
+    @staticmethod
+    def stream_csv_in_chunks(filename: str, chunk_size: int = 10):
+        with open(filename, "r") as file:
+            reader = csv.reader(file)
+            # Skip header if present
+            next(reader, None)
+            chunk = []
+            for row in reader:
+                chunk.append(row)
+                if len(chunk) >= chunk_size:
+                    yield chunk
+                    chunk = []
+        if chunk:  # Yield any remaining records
+            yield chunk
 
 
 def main():
