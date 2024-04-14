@@ -63,10 +63,14 @@ class PortfolioSimulator:
     ) -> None:
         for asset in assets:
             if asset.name == stock_name:
+                diff = (stock_price - asset.price) * asset.no_of_shares
                 asset.price = stock_price
                 while asset.parent:
                     asset = asset.parent
-                    if asset.has_valid_prices():
+                    if asset.price != 0.0:
+                        asset.price += diff
+                        calculated_prices.append([asset.name, asset.price])
+                    elif asset.has_valid_prices():
                         asset.price = asset.calculate_portfolio_value()
                         calculated_prices.append([asset.name, asset.price])
                 return
